@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-10
+
+### Added
+- GamerPower icon in `brand/`, served locally by Home Assistant.
+- `Tag & Release` workflow: a version bump in `manifest.json` on `main` creates the tag and GitHub release.
+- Test that the `manifest.json` and `const.py` versions match.
+
+### Changed
+- README split into English (`README.md`, default) and Ukrainian (`doc/README_uk.md`).
+
+### Fixed
+- `VERSION` in `const.py` now matches `manifest.json`, so the release workflow no longer fails.
+
 ## [1.0.0] - 2026-10-10
 
 ### Added
@@ -13,5 +26,3 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Calendar with giveaways that have a known end date.
 - Services `refresh`, `get_giveaways` (response) and `reset_seen`.
 - Diagnostics, English and Ukrainian translations.
-- GamerPower icon in `brand/`, served locally by Home Assistant.
-- `Tag & Release` workflow: a version bump in `manifest.json` on `main` creates the tag and GitHub release.
