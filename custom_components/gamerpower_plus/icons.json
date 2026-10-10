@@ -1,0 +1,44 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "expiring_soon": {
+        "default": "mdi:timer-sand",
+        "state": {
+          "on": "mdi:timer-alert"
+        }
+      }
+    },
+    "calendar": {
+      "giveaways": {
+        "default": "mdi:calendar-star"
+      }
+    },
+    "event": {
+      "new_giveaway": {
+        "default": "mdi:gift-outline"
+      }
+    },
+    "sensor": {
+      "active_giveaways": {
+        "default": "mdi:gift"
+      },
+      "latest_giveaway": {
+        "default": "mdi:gift-open"
+      },
+      "total_worth": {
+        "default": "mdi:cash-multiple"
+      }
+    }
+  },
+  "services": {
+    "get_giveaways": {
+      "service": "mdi:format-list-bulleted"
+    },
+    "refresh": {
+      "service": "mdi:refresh"
+    },
+    "reset_seen": {
+      "service": "mdi:eye-off-outline"
+    }
+  }
+}

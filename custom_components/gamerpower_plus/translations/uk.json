@@ -1,0 +1,199 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "GamerPower Plus",
+        "description": "Відстеження безкоштовних роздач ігор з GamerPower.com. Платформи й типи запитуються через API, решта налаштувань застосовується локально, і їх можна змінити пізніше в параметрах.",
+        "data": {
+          "name": "Назва",
+          "platforms": "Платформи",
+          "types": "Типи роздач",
+          "sort_by": "Сортування",
+          "update_interval": "Інтервал оновлення",
+          "min_worth": "Мінімальна вартість",
+          "include_no_worth": "Включати роздачі без вартості (N/A)",
+          "exclude_keywords": "Ключові слова для виключення",
+          "expiring_hours": "Поріг «Скоро закінчиться»"
+        },
+        "data_description": {
+          "name": "Залиште порожнім, щоб згенерувати з платформ і типів, наприклад «Steam, Epic — game».",
+          "platforms": "Роздача підходить, якщо вона доступна хоча б на одній з вибраних платформ.",
+          "types": "Game: повні ігри, Loot: DLC та внутрішньоігрові предмети, Beta: ранній доступ і бета-ключі.",
+          "sort_by": "Порядок списку роздач.",
+          "update_interval": "Хвилин між оновленнями (щонайменше 15).",
+          "min_worth": "Приховувати роздачі, дешевші за цю суму в USD. 0 — показувати всі.",
+          "include_no_worth": "Залишати роздачі з невідомою вартістю (N/A).",
+          "exclude_keywords": "Через кому, без урахування регістру. Роздачі, назва яких містить будь-яке з них, приховуються.",
+          "expiring_hours": "«Скоро закінчиться» вмикається, якщо роздача завершується протягом стількох годин."
+        }
+      },
+      "reconfigure": {
+        "title": "Змінити платформи й типи",
+        "description": "Роздачі, які вже активні для нового вибору, не будуть позначені як нові.",
+        "data": {
+          "platforms": "Платформи",
+          "types": "Типи роздач"
+        },
+        "data_description": {
+          "platforms": "Роздача підходить, якщо вона доступна хоча б на одній з вибраних платформ.",
+          "types": "Game: повні ігри, Loot: DLC та внутрішньоігрові предмети, Beta: ранній доступ і бета-ключі."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не вдалося підключитися до GamerPower API.",
+      "unknown": "Неочікувана помилка.",
+      "no_platforms": "Виберіть хоча б одну платформу.",
+      "no_types": "Виберіть хоча б один тип роздач."
+    },
+    "abort": {
+      "already_configured": "Запис з такими платформами й типами вже існує.",
+      "reconfigure_successful": "Налаштування успішно змінено."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Параметри GamerPower Plus",
+        "data": {
+          "sort_by": "Сортування",
+          "update_interval": "Інтервал оновлення",
+          "min_worth": "Мінімальна вартість",
+          "include_no_worth": "Включати роздачі без вартості (N/A)",
+          "exclude_keywords": "Ключові слова для виключення",
+          "expiring_hours": "Поріг «Скоро закінчиться»"
+        },
+        "data_description": {
+          "sort_by": "Порядок списку роздач.",
+          "update_interval": "Хвилин між оновленнями (щонайменше 15).",
+          "min_worth": "Приховувати роздачі, дешевші за цю суму в USD. 0 — показувати всі.",
+          "include_no_worth": "Залишати роздачі з невідомою вартістю (N/A).",
+          "exclude_keywords": "Через кому, без урахування регістру. Роздачі, назва яких містить будь-яке з них, приховуються.",
+          "expiring_hours": "«Скоро закінчиться» вмикається, якщо роздача завершується протягом стількох годин."
+        }
+      }
+    }
+  },
+  "selector": {
+    "platform": {
+      "options": {
+        "steam": "Steam",
+        "epic-games-store": "Epic Games Store",
+        "pc": "PC (усі магазини)",
+        "gog": "GOG",
+        "ubisoft": "Ubisoft Connect",
+        "itchio": "itch.io",
+        "battlenet": "Battle.net",
+        "origin": "Origin / EA app",
+        "drm-free": "DRM-Free",
+        "ps4": "PlayStation 4",
+        "ps5": "PlayStation 5",
+        "xbox-one": "Xbox One",
+        "xbox-series-xs": "Xbox Series X|S",
+        "xbox-360": "Xbox 360",
+        "switch": "Nintendo Switch",
+        "android": "Android",
+        "ios": "iOS",
+        "vr": "VR"
+      }
+    },
+    "giveaway_type": {
+      "options": {
+        "game": "Гра",
+        "loot": "Лут (DLC, внутрішньоігрові предмети)",
+        "beta": "Бета / ранній доступ"
+      }
+    },
+    "sort_by": {
+      "options": {
+        "date": "Дата",
+        "value": "Вартість",
+        "popularity": "Популярність"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "expiring_soon": {
+        "name": "Скоро закінчиться"
+      }
+    },
+    "calendar": {
+      "giveaways": {
+        "name": "Роздачі"
+      }
+    },
+    "event": {
+      "new_giveaway": {
+        "name": "Нова роздача",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "new_giveaway": "Нова роздача"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "active_giveaways": {
+        "name": "Активні роздачі"
+      },
+      "latest_giveaway": {
+        "name": "Остання роздача"
+      },
+      "total_worth": {
+        "name": "Загальна вартість"
+      }
+    }
+  },
+  "exceptions": {
+    "update_failed": {
+      "message": "Помилка отримання роздач з GamerPower: {error}"
+    },
+    "entry_not_found": {
+      "message": "Немає запису GamerPower Plus з ID {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "Запис GamerPower Plus {entry_id} не завантажено."
+    },
+    "no_loaded_entries": {
+      "message": "Немає завантажених записів GamerPower Plus."
+    },
+    "refresh_failed": {
+      "message": "Не вдалося оновити: {entries}."
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Оновити",
+      "description": "Негайно отримує роздачі.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Запис",
+          "description": "Запис для оновлення. Залиште порожнім, щоб оновити всі."
+        }
+      }
+    },
+    "get_giveaways": {
+      "name": "Отримати роздачі",
+      "description": "Повертає поточний відфільтрований список роздач з усіма полями.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Запис",
+          "description": "Запис для читання. Залиште порожнім, щоб отримати всі."
+        }
+      }
+    },
+    "reset_seen": {
+      "name": "Скинути переглянуті роздачі",
+      "description": "Забуває, які роздачі вже бачено, й оновлює дані, тож усі поточні роздачі прийдуть як нові. Корисно для тестування сповіщень.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Запис",
+          "description": "Запис для скидання. Залиште порожнім, щоб скинути всі."
+        }
+      }
+    }
+  }
+}

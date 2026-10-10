@@ -1,0 +1,12 @@
+{
+  "domain": "gamerpower_plus",
+  "name": "GamerPower Plus",
+  "codeowners": ["@NetZhizni"],
+  "config_flow": true,
+  "documentation": "https://github.com/NetZhizni/ha-gamerpower-plus",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/NetZhizni/ha-gamerpower-plus/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

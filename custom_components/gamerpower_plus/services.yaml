@@ -1,0 +1,23 @@
+refresh:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: gamerpower_plus
+
+get_giveaways:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: gamerpower_plus
+
+reset_seen:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: gamerpower_plus

@@ -1,0 +1,199 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "GamerPower Plus",
+        "description": "Track free game giveaways from GamerPower.com. Platforms and types are queried from the API; the other settings are applied locally and can be changed later in the options.",
+        "data": {
+          "name": "Name",
+          "platforms": "Platforms",
+          "types": "Giveaway types",
+          "sort_by": "Sort by",
+          "update_interval": "Update interval",
+          "min_worth": "Minimum worth",
+          "include_no_worth": "Include giveaways without worth (N/A)",
+          "exclude_keywords": "Exclude keywords",
+          "expiring_hours": "Expiring soon threshold"
+        },
+        "data_description": {
+          "name": "Leave empty to generate it from the platforms and types, e.g. \"Steam, Epic — game\".",
+          "platforms": "A giveaway matches if it is available on any of the selected platforms.",
+          "types": "Game: full games, Loot: DLC and in-game items, Beta: early access and beta keys.",
+          "sort_by": "Order of the giveaway list.",
+          "update_interval": "Minutes between updates (at least 15).",
+          "min_worth": "Hide giveaways worth less than this amount in USD. 0 shows every giveaway.",
+          "include_no_worth": "Keep giveaways whose worth is unknown (N/A).",
+          "exclude_keywords": "Comma separated, case insensitive. Giveaways whose title contains any of them are hidden.",
+          "expiring_hours": "\"Expiring soon\" turns on when a giveaway ends within this many hours."
+        }
+      },
+      "reconfigure": {
+        "title": "Change platforms and types",
+        "description": "Giveaways that are already active for the new selection will not be reported as new.",
+        "data": {
+          "platforms": "Platforms",
+          "types": "Giveaway types"
+        },
+        "data_description": {
+          "platforms": "A giveaway matches if it is available on any of the selected platforms.",
+          "types": "Game: full games, Loot: DLC and in-game items, Beta: early access and beta keys."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the GamerPower API.",
+      "unknown": "Unexpected error.",
+      "no_platforms": "Select at least one platform.",
+      "no_types": "Select at least one giveaway type."
+    },
+    "abort": {
+      "already_configured": "An entry with these platforms and types already exists.",
+      "reconfigure_successful": "Re-configuration was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "GamerPower Plus options",
+        "data": {
+          "sort_by": "Sort by",
+          "update_interval": "Update interval",
+          "min_worth": "Minimum worth",
+          "include_no_worth": "Include giveaways without worth (N/A)",
+          "exclude_keywords": "Exclude keywords",
+          "expiring_hours": "Expiring soon threshold"
+        },
+        "data_description": {
+          "sort_by": "Order of the giveaway list.",
+          "update_interval": "Minutes between updates (at least 15).",
+          "min_worth": "Hide giveaways worth less than this amount in USD. 0 shows every giveaway.",
+          "include_no_worth": "Keep giveaways whose worth is unknown (N/A).",
+          "exclude_keywords": "Comma separated, case insensitive. Giveaways whose title contains any of them are hidden.",
+          "expiring_hours": "\"Expiring soon\" turns on when a giveaway ends within this many hours."
+        }
+      }
+    }
+  },
+  "selector": {
+    "platform": {
+      "options": {
+        "steam": "Steam",
+        "epic-games-store": "Epic Games Store",
+        "pc": "PC (all stores)",
+        "gog": "GOG",
+        "ubisoft": "Ubisoft Connect",
+        "itchio": "itch.io",
+        "battlenet": "Battle.net",
+        "origin": "Origin / EA app",
+        "drm-free": "DRM-Free",
+        "ps4": "PlayStation 4",
+        "ps5": "PlayStation 5",
+        "xbox-one": "Xbox One",
+        "xbox-series-xs": "Xbox Series X|S",
+        "xbox-360": "Xbox 360",
+        "switch": "Nintendo Switch",
+        "android": "Android",
+        "ios": "iOS",
+        "vr": "VR"
+      }
+    },
+    "giveaway_type": {
+      "options": {
+        "game": "Game",
+        "loot": "Loot (DLC, in-game items)",
+        "beta": "Beta / early access"
+      }
+    },
+    "sort_by": {
+      "options": {
+        "date": "Date",
+        "value": "Value",
+        "popularity": "Popularity"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "expiring_soon": {
+        "name": "Expiring soon"
+      }
+    },
+    "calendar": {
+      "giveaways": {
+        "name": "Giveaways"
+      }
+    },
+    "event": {
+      "new_giveaway": {
+        "name": "New giveaway",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "new_giveaway": "New giveaway"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "active_giveaways": {
+        "name": "Active giveaways"
+      },
+      "latest_giveaway": {
+        "name": "Latest giveaway"
+      },
+      "total_worth": {
+        "name": "Total worth"
+      }
+    }
+  },
+  "exceptions": {
+    "update_failed": {
+      "message": "Error fetching giveaways from GamerPower: {error}"
+    },
+    "entry_not_found": {
+      "message": "No GamerPower Plus entry with ID {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "GamerPower Plus entry {entry_id} is not loaded."
+    },
+    "no_loaded_entries": {
+      "message": "No GamerPower Plus entries are loaded."
+    },
+    "refresh_failed": {
+      "message": "Updating failed for: {entries}."
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh",
+      "description": "Fetches giveaways now.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "Entry to refresh. Leave empty to refresh all entries."
+        }
+      }
+    },
+    "get_giveaways": {
+      "name": "Get giveaways",
+      "description": "Returns the current filtered giveaways with all fields.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "Entry to read. Leave empty to return all entries."
+        }
+      }
+    },
+    "reset_seen": {
+      "name": "Reset seen giveaways",
+      "description": "Forgets which giveaways were already seen and refreshes, so every current giveaway is reported as new. Useful to test notifications.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "Entry to reset. Leave empty to reset all entries."
+        }
+      }
+    }
+  }
+}
