@@ -312,7 +312,7 @@ content: |
 
 ## Релізи
 
-Workflow `Tag & Release` запускається на кожен push у `main`, який змінює `custom_components/gamerpower_plus/manifest.json`. Якщо тега з такою `version` ще немає, він створює тег і GitHub Release з автоматичними нотатками, і HACS пропонує цей реліз як оновлення. Щоб випустити реліз:
+Workflow `Tag & Release` запускається на кожен push у `main` і читає `version` з `custom_components/gamerpower_plus/manifest.json`. Якщо тега або GitHub Release для цієї версії ще немає, він створює те, чого бракує (реліз отримує автоматичні нотатки), і HACS пропонує цей реліз як оновлення. Якщо запуск упав, наступний push у `main` повторить його; workflow можна також запустити вручну на вкладці Actions. Щоб випустити реліз:
 
 1. Підніміть `version` у `manifest.json` і `VERSION` у `const.py` (workflow і тест перевіряють, що вони однакові).
 2. Допишіть зміни в `CHANGELOG.md`.

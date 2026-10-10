@@ -312,7 +312,7 @@ Giveaway data is provided by [GamerPower.com](https://www.gamerpower.com). Every
 
 ## Releases
 
-The `Tag & Release` workflow runs on every push to `main` that changes `custom_components/gamerpower_plus/manifest.json`. When the tag for its `version` doesn't exist yet, the workflow creates the tag and a GitHub release with generated notes, and HACS offers that release as an update. To publish a release:
+The `Tag & Release` workflow runs on every push to `main` and reads `version` from `custom_components/gamerpower_plus/manifest.json`. When the tag or the GitHub release for that version doesn't exist yet, the workflow creates whichever is missing (the release gets generated notes), and HACS offers that release as an update. If a run fails, the next push to `main` retries it; the workflow can also be started manually from the Actions tab. To publish a release:
 
 1. Bump `version` in `manifest.json` and `VERSION` in `const.py` (the workflow and a test check they match).
 2. Add the changes to `CHANGELOG.md`.

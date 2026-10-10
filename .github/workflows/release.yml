@@ -1,14 +1,19 @@
 name: Tag & Release
 
+# Runs on every push to main, not only on manifest.json changes: if a previous
+# run failed (e.g. version mismatch), the next push retries the missing tag or
+# release. Every step is idempotent, so runs with nothing to publish are no-ops.
 on:
   push:
     branches: [main]
-    paths:
-      - custom_components/gamerpower_plus/manifest.json
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   tag-release:
@@ -34,27 +39,42 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Check if tag already exists
-        id: check_tag
-        run: |
-          if git ls-remote --tags origin "refs/tags/${{ steps.version.outputs.version }}" | grep -q .; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Create tag and GitHub release
-        if: steps.check_tag.outputs.exists == 'false'
+      - name: Check existing tag and release
+        id: check
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "tag=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=false" >> "$GITHUB_OUTPUT"
+          fi
+          if gh release view "$VERSION" > /dev/null 2>&1; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create tag
+        if: steps.check.outputs.tag == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
           git tag "$VERSION"
           git push origin "$VERSION"
+
+      - name: Create GitHub release
+        if: steps.check.outputs.release == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
           gh release create "$VERSION" \
+            --verify-tag \
             --title "$VERSION" \
             --generate-notes
 
-      - name: Skip (version unchanged)
-        if: steps.check_tag.outputs.exists == 'true'
-        run: echo "Tag ${{ steps.version.outputs.version }} already exists, skipping release."
+      - name: Skip (already released)
+        if: steps.check.outputs.tag == 'true' && steps.check.outputs.release == 'true'
+        run: echo "Tag and release ${{ steps.version.outputs.version }} already exist, skipping."

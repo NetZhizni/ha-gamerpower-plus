@@ -15,6 +15,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 - `VERSION` in `const.py` now matches `manifest.json`, so the release workflow no longer fails.
+- `Tag & Release` workflow runs on every push to `main` and creates a missing tag or release, so a failed run is retried by the next push.
 
 ## [1.0.0] - 2026-10-10
 
