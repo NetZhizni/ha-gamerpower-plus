@@ -13,3 +13,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Calendar with giveaways that have a known end date.
 - Services `refresh`, `get_giveaways` (response) and `reset_seen`.
 - Diagnostics, English and Ukrainian translations.
+- GamerPower icon in `brand/`, served locally by Home Assistant.
+- `Tag & Release` workflow: a version bump in `manifest.json` on `main` creates the tag and GitHub release.

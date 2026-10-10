@@ -1,10 +1,3 @@
-[project]
-name = "ha-gamerpower-plus"
-version = "1.0.0"
-description = "Home Assistant custom integration for GamerPower.com giveaways"
-requires-python = ">=3.13"
-license = "MIT"
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
