@@ -312,10 +312,10 @@ content: |
 
 ## Релізи
 
-Workflow `Tag & Release` запускається на кожен push у `main` і читає `version` з `custom_components/gamerpower_plus/manifest.json`. Якщо тега або GitHub Release для цієї версії ще немає, він створює те, чого бракує (реліз отримує автоматичні нотатки), і HACS пропонує цей реліз як оновлення. Якщо запуск упав, наступний push у `main` повторить його; workflow можна також запустити вручну на вкладці Actions. Щоб випустити реліз:
+Workflow `Tag & Release` запускається на кожен push у `main` і читає `version` з `custom_components/gamerpower_plus/manifest.json` — це єдине місце, де зберігається версія. Спершу він проганяє тести, hassfest і HACS-валідацію; якщо вони пройшли, а тега або GitHub Release для цієї версії ще немає, він створює те, чого бракує, і HACS пропонує цей реліз як оновлення. Нотатки релізу — це секція цієї версії з `CHANGELOG.md`. Якщо запуск упав, наступний push у `main` повторить його; workflow можна також запустити вручну на вкладці Actions. Щоб випустити реліз:
 
-1. Підніміть `version` у `manifest.json` і `VERSION` у `const.py` (workflow і тест перевіряють, що вони однакові).
-2. Допишіть зміни в `CHANGELOG.md`.
+1. Підніміть `version` у `manifest.json`.
+2. Додайте в `CHANGELOG.md` секцію `## [X.Y.Z] - YYYY-MM-DD` (тест перевіряє, що вона є).
 3. Зробіть push у `main`.
 
 Іконку з `custom_components/gamerpower_plus/brand/` Home Assistant роздає сам (перевірено на 2026.10), тож запис у home-assistant/brands не потрібен. Версії без підтримки локальних брендів показують іконку-заглушку.

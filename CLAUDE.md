@@ -7,10 +7,8 @@
 - **Жодних `git commit` і `git push`** (а також тегів, релізів, PR). Комітить і пушить користувач сам. Після змін лише вивести в чаті підсумок і, за потреби, запропонований текст коміт-повідомлення.
 - **PATCH-версія піднімається при кожній зміні інтеграції** (`custom_components/gamerpower_plus/`): `1.0.0` → `1.0.1`.
   - Спершу перевір `git diff HEAD -- custom_components/gamerpower_plus/manifest.json`. Якщо `version` там уже змінено, але не закомічено, версію **не чіпати**: усі незакомічені зміни йдуть в одну версію.
-  - Версія живе у двох місцях, і вони мають збігатися (це перевіряють `tests/test_manifest.py` і workflow `release.yml`):
-    - `custom_components/gamerpower_plus/manifest.json` → `"version"`;
-    - `custom_components/gamerpower_plus/const.py` → `VERSION`.
-  - Разом з версією додати секцію в `CHANGELOG.md` (формат Keep a Changelog, дата `YYYY-MM-DD`). Якщо секція для поточної незакоміченої версії вже є, дописувати в неї.
+  - Версія живе лише в `custom_components/gamerpower_plus/manifest.json` → `"version"`. Код читає її під час роботи (`async_get_integration`), окремої константи `VERSION` немає й не додавати.
+  - Разом з версією додати секцію `## [X.Y.Z] - YYYY-MM-DD` в `CHANGELOG.md` (формат Keep a Changelog). Якщо секція для поточної незакоміченої версії вже є, дописувати в неї. Її наявність перевіряє `tests/test_manifest.py`, а `release.yml` бере з неї нотатки релізу.
   - MINOR/MAJOR піднімати лише на прохання користувача.
 
 ## Про проєкт
@@ -34,7 +32,7 @@ custom_components/gamerpower_plus/
   calendar.py        роздачі з відомою датою завершення
   services.py        refresh, get_giveaways (з response), reset_seen
   diagnostics.py     діагностика запису
-  const.py           усі константи, VERSION, дефолти опцій
+  const.py           усі константи, дефолти опцій
   strings.json, translations/en.json, translations/uk.json
   services.yaml, icons.json, manifest.json
   brand/             icon.png, icon@2x.png (HA роздає їх локально)
@@ -71,4 +69,4 @@ CI використовує Python 3.14; `ruff` налаштований на `p
 
 ## Релізи
 
-`release.yml` спрацьовує на кожен push у `main` (і вручну): бере `version` з `manifest.json` і створює тег та/або GitHub Release, якщо їх ще немає, тож упалий запуск повторюється наступним пушем. HACS після цього пропонує оновлення. Тобто підняття версії = реліз після пушу користувачем.
+`release.yml` спрацьовує на кожен push у `main` (і вручну): спершу через `workflow_call` проганяє `tests.yml` і `validate.yml`, потім бере `version` з `manifest.json` і створює тег та/або GitHub Release (нотатки з секції `CHANGELOG.md`), якщо їх ще немає, тож упалий запуск повторюється наступним пушем. HACS після цього пропонує оновлення. Тобто підняття версії = реліз після пушу користувачем.

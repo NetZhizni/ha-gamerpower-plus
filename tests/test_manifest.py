@@ -5,15 +5,18 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from custom_components.gamerpower_plus.const import DOMAIN, VERSION
+from custom_components.gamerpower_plus.const import DOMAIN
 
-INTEGRATION_DIR = Path(__file__).parents[1] / "custom_components" / DOMAIN
+ROOT = Path(__file__).parents[1]
+INTEGRATION_DIR = ROOT / "custom_components" / DOMAIN
 
 
-def test_version_matches_manifest() -> None:
-    """The release workflow tags manifest.json's version; const.py must agree."""
+def test_changelog_has_manifest_version() -> None:
+    """The release workflow takes its notes from this version's CHANGELOG section."""
     manifest = json.loads((INTEGRATION_DIR / "manifest.json").read_text("utf-8"))
-    assert manifest["version"] == VERSION
+    heading = f"## [{manifest['version']}] - "
+    lines = (ROOT / "CHANGELOG.md").read_text("utf-8").splitlines()
+    assert any(line.startswith(heading) for line in lines)
 
 
 def test_brand_icons_present() -> None:

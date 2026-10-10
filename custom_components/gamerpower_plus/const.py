@@ -7,7 +7,6 @@ from typing import Final
 
 DOMAIN: Final = "gamerpower_plus"
 NAME: Final = "GamerPower Plus"
-VERSION: Final = "1.0.1"
 
 ATTRIBUTION: Final = "Data provided by GamerPower.com"
 MANUFACTURER: Final = "GamerPower"

@@ -188,7 +188,7 @@ class GamerPowerPlusConfigFlow(ConfigFlow, domain=DOMAIN):
     async def _async_test_connection(
         self, platforms: list[str], types: list[str]
     ) -> dict[str, str]:
-        client = async_create_client(self.hass)
+        client = await async_create_client(self.hass)
         try:
             await client.async_get_giveaways(platforms, types)
         except GamerPowerError as err:

@@ -1,23 +1,34 @@
 name: Tag & Release
 
 # Runs on every push to main, not only on manifest.json changes: if a previous
-# run failed (e.g. version mismatch), the next push retries the missing tag or
-# release. Every step is idempotent, so runs with nothing to publish are no-ops.
+# run failed, the next push retries the missing tag or release. Nothing is
+# published unless tests and validation pass. Every step is idempotent, so runs
+# with nothing to publish are no-ops.
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release
   cancel-in-progress: false
 
 jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  validate:
+    uses: ./.github/workflows/validate.yml
+
   tag-release:
+    needs: [tests, validate]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,11 +41,6 @@ jobs:
           VERSION=$(jq -r '.version' custom_components/gamerpower_plus/manifest.json)
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
             echo "::error::Could not read version from manifest.json"
-            exit 1
-          fi
-          CONST_VERSION=$(sed -n 's/^VERSION: Final = "\(.*\)"$/\1/p' custom_components/gamerpower_plus/const.py)
-          if [ "$VERSION" != "$CONST_VERSION" ]; then
-            echo "::error::manifest.json version $VERSION differs from const.py VERSION $CONST_VERSION"
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -56,6 +62,22 @@ jobs:
             echo "release=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Extract release notes from CHANGELOG.md
+        if: steps.check.outputs.release == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v heading="## [$VERSION]" '
+            index($0, heading) == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/release_notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/release_notes.md"; then
+            echo "::error::CHANGELOG.md has no section for $VERSION"
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/release_notes.md"
+
       - name: Create tag
         if: steps.check.outputs.tag == 'false'
         env:
@@ -69,10 +91,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
+        # The CHANGELOG section comes first; --generate-notes appends the
+        # "Full Changelog" compare link.
         run: |
           gh release create "$VERSION" \
             --verify-tag \
             --title "$VERSION" \
+            --notes-file "$RUNNER_TEMP/release_notes.md" \
             --generate-notes
 
       - name: Skip (already released)

@@ -42,8 +42,9 @@ from typing import Any
 import aiohttp
 
 from homeassistant.const import __version__ as ha_version
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
@@ -55,12 +56,10 @@ from .const import (
     GAMING_PLATFORMS,
     GIVEAWAY_TYPES,
     PROJECT_URL,
-    VERSION,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-USER_AGENT = f"HomeAssistant/{ha_version} ha-gamerpower-plus/{VERSION} (+{PROJECT_URL})"
 DATA_THROTTLE: HassKey[RequestThrottle] = HassKey(f"{DOMAIN}_throttle")
 
 _DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -77,6 +76,12 @@ class GamerPowerConnectionError(GamerPowerError):
 
 class GamerPowerResponseError(GamerPowerError):
     """The API answered with an unexpected status or payload."""
+
+
+def build_user_agent(version: str | None = None) -> str:
+    """Return the User-Agent sent to GamerPower, with the integration version."""
+    product = f"ha-gamerpower-plus/{version}" if version else "ha-gamerpower-plus"
+    return f"HomeAssistant/{ha_version} {product} (+{PROJECT_URL})"
 
 
 def parse_worth(value: Any) -> float | None:
@@ -261,11 +266,13 @@ class GamerPowerClient:
         session: aiohttp.ClientSession,
         throttle: RequestThrottle | None = None,
         base_url: str = API_BASE_URL,
+        user_agent: str | None = None,
     ) -> None:
         """Initialize the client."""
         self._session = session
         self._throttle = throttle or RequestThrottle()
         self._base_url = base_url.rstrip("/")
+        self._user_agent = user_agent or build_user_agent()
 
     async def async_get_giveaways(
         self,
@@ -347,7 +354,7 @@ class GamerPowerClient:
             async with self._session.get(
                 url,
                 params=dict(params),
-                headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+                headers={"User-Agent": self._user_agent, "Accept": "application/json"},
                 timeout=aiohttp.ClientTimeout(total=API_TIMEOUT),
             ) as response:
                 if response.status == 201:
@@ -372,9 +379,17 @@ class GamerPowerClient:
             ) from err
 
 
-@callback
-def async_create_client(hass: HomeAssistant) -> GamerPowerClient:
-    """Create a client that shares the session and throttle of all entries."""
+async def async_create_client(hass: HomeAssistant) -> GamerPowerClient:
+    """Create a client that shares the session and throttle of all entries.
+
+    The version in the User-Agent comes from manifest.json, its only source.
+    """
+    integration = await async_get_integration(hass, DOMAIN)
+    version = str(integration.version) if integration.version else None
     if (throttle := hass.data.get(DATA_THROTTLE)) is None:
         throttle = hass.data[DATA_THROTTLE] = RequestThrottle()
-    return GamerPowerClient(async_get_clientsession(hass), throttle)
+    return GamerPowerClient(
+        async_get_clientsession(hass),
+        throttle,
+        user_agent=build_user_agent(version),
+    )

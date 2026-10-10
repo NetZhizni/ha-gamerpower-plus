@@ -34,7 +34,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: GamerPowerConfigEntry) -> bool:
     """Set up GamerPower Plus from a config entry."""
-    coordinator = GamerPowerCoordinator(hass, entry, async_create_client(hass))
+    coordinator = GamerPowerCoordinator(hass, entry, await async_create_client(hass))
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
 

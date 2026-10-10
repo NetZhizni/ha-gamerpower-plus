@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import json
+from pathlib import Path
 import time
 
 import aiohttp
@@ -15,14 +17,18 @@ from custom_components.gamerpower_plus.api import (
     Giveaway,
     RequestThrottle,
     async_create_client,
+    build_user_agent,
     parse_datetime,
     parse_giveaways,
     parse_platforms,
     parse_worth,
 )
+from custom_components.gamerpower_plus.const import DOMAIN
 from homeassistant.core import HomeAssistant
 
 from .conftest import load_fixture_json, mock_filter
+
+MANIFEST = Path(__file__).parents[1] / "custom_components" / DOMAIN / "manifest.json"
 
 # Captured at import time, before the autouse fixture patches it out.
 _REAL_THROTTLE_WAIT = RequestThrottle.wait
@@ -114,7 +120,7 @@ async def test_request_parameters(
 ) -> None:
     """Platforms and types are joined with dots, sort-by is passed on."""
     mock_filter(aioclient_mock, load_fixture_json("giveaways.json"))
-    client = async_create_client(hass)
+    client = await async_create_client(hass)
     giveaways = await client.async_get_giveaways(
         ["steam", "epic-games-store"], ["game", "loot"], "value"
     )
@@ -123,7 +129,8 @@ async def test_request_parameters(
     assert url.query["platform"] == "steam.epic-games-store"
     assert url.query["type"] == "game.loot"
     assert url.query["sort-by"] == "value"
-    assert "ha-gamerpower-plus" in headers["User-Agent"]
+    version = json.loads(MANIFEST.read_text("utf-8"))["version"]
+    assert f"ha-gamerpower-plus/{version} " in headers["User-Agent"]
 
 
 @pytest.mark.parametrize(
@@ -137,7 +144,7 @@ async def test_unknown_filters_rejected(
     types: list[str],
 ) -> None:
     """Unknown values are not sent; /filter would ignore them and widen results."""
-    client = async_create_client(hass)
+    client = await async_create_client(hass)
     with pytest.raises(ValueError, match="Unsupported"):
         await client.async_get_giveaways(platforms, types)
     assert aioclient_mock.call_count == 0
@@ -148,7 +155,7 @@ async def test_status_201_is_empty(
 ) -> None:
     """HTTP 201 means no active giveaways, not an error."""
     mock_filter(aioclient_mock, status=201)
-    client = async_create_client(hass)
+    client = await async_create_client(hass)
     assert await client.async_get_giveaways(["gog"], ["beta"]) == []
 
 
@@ -170,7 +177,7 @@ async def test_request_errors(
 ) -> None:
     """Network errors, bad statuses and invalid JSON raise errors."""
     mock_filter(aioclient_mock, **kwargs)
-    client = async_create_client(hass)
+    client = await async_create_client(hass)
     with pytest.raises(error):
         await client.async_get_giveaways(["steam"], ["game"])
 
@@ -186,7 +193,7 @@ async def test_other_endpoints(
         "https://www.gamerpower.com/api/worth",
         json={"active_giveaways_number": 33, "worth_estimation_usd": "133.88"},
     )
-    client = async_create_client(hass)
+    client = await async_create_client(hass)
     assert len(await client.async_get_all_giveaways("steam", "game", "date")) == 5
     giveaway = await client.async_get_giveaway(3810)
     assert giveaway is not None
@@ -205,4 +212,10 @@ async def test_throttle_spaces_requests() -> None:
 
 async def test_client_shares_throttle(hass: HomeAssistant) -> None:
     """All clients of one hass instance share the throttle."""
-    assert async_create_client(hass)._throttle is async_create_client(hass)._throttle
+    first, second = await async_create_client(hass), await async_create_client(hass)
+    assert first._throttle is second._throttle
+
+
+def test_user_agent_without_version() -> None:
+    """A client created without a version still identifies the integration."""
+    assert "ha-gamerpower-plus (+" in build_user_agent()

@@ -3,6 +3,16 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-10-11
+
+### Changed
+- The integration version lives only in `manifest.json`; the API client reads it at runtime for its User-Agent, and `VERSION` was removed from `const.py`.
+- `Tag & Release` workflow publishes only after tests, hassfest and HACS validation pass.
+- Release notes come from the version's section in `CHANGELOG.md` instead of the generated PR list.
+
+### Added
+- Test that `CHANGELOG.md` has a section for the `manifest.json` version.
+
 ## [1.0.1] - 2026-10-10
 
 ### Added

@@ -312,10 +312,10 @@ Giveaway data is provided by [GamerPower.com](https://www.gamerpower.com). Every
 
 ## Releases
 
-The `Tag & Release` workflow runs on every push to `main` and reads `version` from `custom_components/gamerpower_plus/manifest.json`. When the tag or the GitHub release for that version doesn't exist yet, the workflow creates whichever is missing (the release gets generated notes), and HACS offers that release as an update. If a run fails, the next push to `main` retries it; the workflow can also be started manually from the Actions tab. To publish a release:
+The `Tag & Release` workflow runs on every push to `main` and reads `version` from `custom_components/gamerpower_plus/manifest.json`, the only place the version is kept. It first runs the tests, hassfest and HACS validation; if they pass and the tag or the GitHub release for that version doesn't exist yet, it creates whichever is missing, and HACS offers that release as an update. The release notes are the version's section in `CHANGELOG.md`. If a run fails, the next push to `main` retries it; the workflow can also be started manually from the Actions tab. To publish a release:
 
-1. Bump `version` in `manifest.json` and `VERSION` in `const.py` (the workflow and a test check they match).
-2. Add the changes to `CHANGELOG.md`.
+1. Bump `version` in `manifest.json`.
+2. Add a `## [X.Y.Z] - YYYY-MM-DD` section to `CHANGELOG.md` (a test checks it exists).
 3. Push to `main`.
 
 The icon in `custom_components/gamerpower_plus/brand/` is served by Home Assistant itself (verified on 2026.10), so no home-assistant/brands entry is needed. Versions without local brand support show a placeholder icon.
